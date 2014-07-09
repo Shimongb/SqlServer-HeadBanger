@@ -15,3 +15,4 @@ c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\S
 c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.TrustInfo.xml
 c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.exe.manifest
 c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.application
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.csprojResolveAssemblyReference.cache

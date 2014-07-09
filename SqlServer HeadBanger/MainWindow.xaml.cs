@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -26,7 +27,7 @@ namespace SqlServer_HeadBanger
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<Data> RsltTable;
+        private List<Data> RsltTable;
         List<Spids> SpidList;
 
         public MainWindow()
@@ -57,7 +58,7 @@ namespace SqlServer_HeadBanger
             pwdTB.IsEnabled = false;
             editBTN.IsEnabled = true;
         }
-
+        
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -124,7 +125,7 @@ namespace SqlServer_HeadBanger
             var db = dbTB.Text.Trim();
             var userId = unTB.Text.Trim();
             var password = pwdTB.Password.Trim();
-            var tsql = StringFromRTB(TSQLTB); // TSQLTB.Text;
+            var tsql = StringFromRTB(TSQLTB);
             var TimeOut = TimeOutTB.Value.ToString();
             var tasks = new Task[(int)sldr.Value];
             var RandStart = RND_st.Text.Trim();
@@ -137,9 +138,8 @@ namespace SqlServer_HeadBanger
             }
             Task.WaitAll(tasks);
             var ET = DateTime.Now;
-            //var duration = ET - ST;
             TimeSpan dateDifference = ET.Subtract(ST);
-          //  string dur = duration.TotalMilliseconds.ToString("c");
+
             dg.ItemsSource = null;
             dg.ItemsSource = RsltTable;
 
@@ -179,7 +179,7 @@ namespace SqlServer_HeadBanger
                     int RandInt = rnd.Next(RND_A, RND_B);
                     CodeStr = tsql.Replace("{RAND_INT}", RandInt.ToString());
 
-
+                    connection.StatisticsEnabled = true;
                     connection.Open();
                     command.ExecuteNonQuery();
                     var res = command.ExecuteScalar();
@@ -189,9 +189,33 @@ namespace SqlServer_HeadBanger
                     var starttime = DateTime.Now;
                     try
                     {
-                        RA = cm.ExecuteNonQuery(); //RowsAffected
+                        RA = cm.ExecuteNonQuery();
                         var endtime = DateTime.Now;
                         var duration = endtime - starttime;
+                        string Xinf = "";
+                        IDictionary currentStatistics = connection.RetrieveStatistics();
+                            
+                        long bytesReceived = (long) currentStatistics["BytesReceived"];
+                        long bytesSent = (long) currentStatistics["BytesSent"];
+                        long selectCount = (long) currentStatistics["SelectCount"];
+                        long selectRows = (long) currentStatistics["SelectRows"];
+                        long ConnectionTime = (long) currentStatistics["ConnectionTime"];
+                        long IduRows = (long)currentStatistics["IduRows"];
+                        long NetworkServerTime = (long)currentStatistics["NetworkServerTime"];
+                        long Transactions = (long)currentStatistics["Transactions"];
+
+                        Xinf = 
+                        "BytesReceived: " + bytesReceived.ToString()+ Environment.NewLine +
+                        "BytesSent: " + bytesSent.ToString() + Environment.NewLine +
+                        "SelectCount: " + selectCount.ToString() + Environment.NewLine +
+                        "SelectRows: " + selectRows.ToString() + Environment.NewLine + 
+                        "ConnectionTime: " + ConnectionTime.ToString() + Environment.NewLine + 
+                        "IduRows: " + IduRows.ToString() + Environment.NewLine +
+                        "NetworkServerTime: " + NetworkServerTime.ToString() + Environment.NewLine +
+                        "Transactions: " + Transactions.ToString();
+
+
+
 
                         RsltTable.Add(new Data
                         {
@@ -200,28 +224,49 @@ namespace SqlServer_HeadBanger
                             StartTime = starttime.ToString("HH:mm:ss:fff"),
                             EndTime = endtime.ToString("HH:mm:ss:fff"),
                             Duration = ((long)duration.TotalMilliseconds).ToString(),
-                            RowsAffected = RA,
-                            State = "Success"
+                            RowsAffected = IduRows,
+                            State = "Success",
+                            BytesReceived = bytesReceived,
+                            BytesSent = bytesSent,
+                            SelectCount = selectCount,
+                            SelectRows = selectRows,
+                            ConnectionTime = ConnectionTime,
+                            NetworkServerTime =NetworkServerTime,
+                            Transactions =Transactions
                         });
                         SpidList.Add(new Spids
                         {
                             SPId = spid
                         });
 
+
+
+
                     }
                     catch (Exception e)
                     {
-
-                        RsltTable.Add(new Data
+                        if (RsltTable != null)
                         {
-                            SPId = spid,
-                            Tsql = CodeStr,
-                            StartTime = " -- ",
-                            EndTime = " -- ",
-                            Duration = "0",
-                            RowsAffected = 0,
-                            State = "Error!"
-                        });
+                            RsltTable.Add(new Data
+                            {
+                                SPId = spid,
+                                Tsql = CodeStr,
+                                StartTime = " -- ",
+                                EndTime = " -- ",
+                                Duration = "0",
+                                RowsAffected = 0,
+                                State = e.Message.ToString(),
+                                BytesReceived = 0,
+                                BytesSent = 0,
+                                SelectCount = 0,
+                                SelectRows = 0,
+                                ConnectionTime = 0,
+                                NetworkServerTime = 0,
+                                Transactions = 0
+                            });
+                        }
+
+                        
                         
                     }
 
@@ -241,8 +286,15 @@ namespace SqlServer_HeadBanger
             public string StartTime { get; set; }
             public string EndTime { get; set; }
             public string Duration { get; set; }
-            public int RowsAffected { get; set; }
+            public long RowsAffected { get; set; }
             public string State { get; set; }
+            public long BytesReceived { get; set; }
+            public long BytesSent { get; set; }
+            public long SelectCount { get; set; }
+            public long SelectRows { get; set; }
+            public long ConnectionTime { get; set; }
+            public long NetworkServerTime { get; set; }
+            public long Transactions { get; set; }
         }
         private class Spids
         {
@@ -254,7 +306,6 @@ namespace SqlServer_HeadBanger
             {
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 string FileUniqueName = "\\HeadBangingResult_" + DateTime.Now.ToBinary().ToString().Replace("-", "") + ".html";
-                // File.WriteAllLines(path + FileUniqueName, RsltTable.ConvertAll(Convert.ToString));
                 string content = @"
 <!--Created By Shimon Gb's SqlServerHeadBanger-->
 <HTML>
@@ -300,13 +351,20 @@ namespace SqlServer_HeadBanger
         <td class=""tblhdr"">Duration</td>
         <td class=""tblhdr"">RowsAffected</td>
         <td class=""tblhdr"">State</td>
+<td class=""tblhdr"">BytesReceived</td>
+<td class=""tblhdr"">BytesSent</td>
+<td class=""tblhdr"">SelectCount</td>
+<td class=""tblhdr"">SelectRows</td>
+<td class=""tblhdr"">ConnectionTime</td>
+<td class=""tblhdr"">NetworkServerTime</td>
+<td class=""tblhdr"">Transactions</td>
     </tr>
 
 ";
                 string OPN_ROW = @"<tr class=""$CLASS$""><td>";
                 string END_ROW = "</td></tr>";
                 string COL = "</td><td>";
-                foreach (Data REC in RsltTable) // Display for verification
+                foreach (Data REC in RsltTable)
                 {
                     if (REC.State == "Error!")
                     {
@@ -316,7 +374,20 @@ namespace SqlServer_HeadBanger
                     {
                         OPN_ROW = OPN_ROW.Replace("$CLASS$", "Row_tbl");
                     }
-                    content += OPN_ROW + REC.SPId.ToString() + COL + REC.Tsql.ToString() + COL + REC.StartTime.ToString() + COL + REC.EndTime.ToString() + COL + REC.Duration.ToString() + COL + REC.RowsAffected + COL + REC.State.ToString() + END_ROW + Environment.NewLine;
+                    content += OPN_ROW + REC.SPId.ToString() + COL +
+                        REC.Tsql.ToString() + COL + 
+                        REC.StartTime.ToString() + COL + 
+                        REC.EndTime.ToString() + COL + 
+                        REC.Duration.ToString() + COL + 
+                        REC.RowsAffected + COL +
+                        REC.State.ToString() + COL + 
+                        REC.BytesReceived + COL +
+                        REC.BytesSent + COL +
+                        REC.SelectCount + COL +
+                        REC.SelectRows + COL +
+                        REC.ConnectionTime + COL +
+                        REC.NetworkServerTime + COL +
+                        REC.Transactions + END_ROW + Environment.NewLine;
                 }
                 content += @"   </TABLE>
     <h3>Did you enjoyed the almighty HeadBanger? so go and tell **ALL** your friends about it!</h3>

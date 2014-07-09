@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SqlServer HeadBanger.exe" size="60416">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SqlServer HeadBanger.exe" size="73728">
       <assemblyIdentity name="SqlServer HeadBanger" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>w0u2Zxb099Qxmxav6X9UmmWcvoH9mWm63rJ6WUuMIi0=</dsig:DigestValue>
+        <dsig:DigestValue>UtpSzlM5EK3fzBSKi0oaUMNd4T22HBlkZEvTiZaF/Uo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
