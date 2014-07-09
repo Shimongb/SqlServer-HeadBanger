@@ -1,0 +1,18 @@
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Release\SqlServer HeadBanger.exe.config
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Release\SqlServer HeadBanger.exe
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Release\SqlServer HeadBanger.pdb
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\MainWindow.baml
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\MainWindow.g.cs
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\App.g.cs
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger_MarkupCompile.cache
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.g.resources
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer_HeadBanger.Properties.Resources.resources
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.csproj.GenerateResource.Cache
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.exe
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.pdb
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Release\SqlServer HeadBanger.exe.manifest
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Release\SqlServer HeadBanger.application
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.csprojResolveAssemblyReference.cache
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.TrustInfo.xml
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.exe.manifest
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Release\SqlServer HeadBanger.application

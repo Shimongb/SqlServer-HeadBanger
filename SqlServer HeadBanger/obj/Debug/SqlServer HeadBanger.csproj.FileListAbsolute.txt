@@ -1,0 +1,12 @@
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Debug\SqlServer HeadBanger.exe.config
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Debug\SqlServer HeadBanger.exe
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\bin\Debug\SqlServer HeadBanger.pdb
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\MainWindow.baml
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\MainWindow.g.cs
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\App.g.cs
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\SqlServer HeadBanger_MarkupCompile.cache
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\SqlServer HeadBanger.g.resources
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\SqlServer_HeadBanger.Properties.Resources.resources
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\SqlServer HeadBanger.csproj.GenerateResource.Cache
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\SqlServer HeadBanger.exe
+c:\users\shimon_gil\documents\visual studio 2012\Projects\SqlServer HeadBanger\SqlServer HeadBanger\obj\Debug\SqlServer HeadBanger.pdb
