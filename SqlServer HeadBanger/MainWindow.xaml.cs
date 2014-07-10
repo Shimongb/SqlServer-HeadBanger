@@ -163,7 +163,8 @@ namespace SqlServer_HeadBanger
                                  long SelectRows,
                                  long ConnectionTime,
                                  long NetworkServerTime,
-                                 long Transactions)
+                                 long Transactions,
+                                 string runres)
         {
             if (RsltTable != null)
             {
@@ -182,7 +183,8 @@ namespace SqlServer_HeadBanger
                     SelectRows = SelectRows,
                     ConnectionTime = ConnectionTime,
                     NetworkServerTime = NetworkServerTime,
-                    Transactions = Transactions
+                    Transactions = Transactions,
+                    RunResults = runres
                 });
             }
             try
@@ -221,19 +223,53 @@ namespace SqlServer_HeadBanger
                     string pattern = "(\\/\\*([\0-\uffff]*?)\\*\\/)|(--.*)";
                     Regex rgx = new Regex(pattern);
                     string ClearTsql = rgx.Replace(CodeStr, "").Trim().ToString();
-                    int RA = 0;
-
                     connection.StatisticsEnabled = true;
                     connection.Open();
                     var res = command.ExecuteScalar();
                     var spid = res.ToString();
                     SqlCommand cm = new SqlCommand(CodeStr, connection);
-
+                    string runres = "";
                     var starttime = DateTime.Now;
                     string StartTime = starttime.ToString("HH:mm:ss:fff");
                     try
                     {
-                        RA = cm.ExecuteNonQuery();
+                        string ls = "";
+                        DataSet ds = new DataSet();
+                        DataTable table = new DataTable();
+                        SqlDataAdapter a = new SqlDataAdapter(CodeStr, connection);
+                        a.Fill(ds);
+                        int tb_serial = 1;
+                        foreach (DataTable tbl in ds.Tables)
+	                        {
+                                int cc = tbl.Columns.Count;
+                                runres += "============ Result[" + tb_serial.ToString() + "] ============" + Environment.NewLine;
+
+                                foreach (DataRow dr in tbl.Rows)
+	                            {
+                                    ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+
+                                        for (int i = 0; i < cc; i++)
+			                            {
+                                            if (i == cc-1)
+                                            {
+                                                ls = "";
+                                            }
+                                            if (dr[i].ToString() != null || dr[i].ToString().Length > 0)
+                                            {
+                                                runres += dr[i].ToString() + ls;
+                                            }
+                                            else
+                                            {
+                                                runres += "NULL" + ls;
+                                            }
+			                             
+			                            }
+                                    runres += Environment.NewLine;
+		 
+	                            }
+                                runres += Environment.NewLine;
+		                        tb_serial++;
+	                        }
                         var endtime = DateTime.Now;
                         var duration = endtime - starttime;
                         IDictionary currentStatistics = connection.RetrieveStatistics();
@@ -248,13 +284,14 @@ namespace SqlServer_HeadBanger
                         long Transactions = (long)currentStatistics["Transactions"];
                         string EndTime = endtime.ToString("HH:mm:ss:fff");
                         long Duration = ((long)duration.TotalMilliseconds);
-                        RegData(spid, ClearTsql, StartTime, EndTime, Duration, IduRows, "Success", bytesSent, bytesReceived, selectCount, selectRows, ConnectionTime, NetworkServerTime, Transactions);
+                        string RunResults = runres;
+                        RegData(spid, ClearTsql, StartTime, EndTime, Duration, IduRows, "Success", bytesSent, bytesReceived, selectCount, selectRows, ConnectionTime, NetworkServerTime, Transactions, runres);
                     }
                     catch (Exception e)
                     {
 
                         string errmsgstr = e.Message.ToString();
-                        RegData(spid, ClearTsql, StartTime, " -- ", 0, 0, errmsgstr, 0, 0, 0, 0, 0, 0, 0);
+                        RegData(spid, ClearTsql, StartTime, " -- ", 0, 0, errmsgstr, 0, 0, 0, 0, 0, 0, 0,"");
                     }
 
                     connection.Close();
@@ -282,26 +319,33 @@ namespace SqlServer_HeadBanger
             public long ConnectionTime { get; set; }
             public long NetworkServerTime { get; set; }
             public long Transactions { get; set; }
-
+            public string RunResults { get; set; }
             public override string ToString()
             {
                 string ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+
+                //if (rowtobyte == null)
+                //{
+                //    rowtobyte = "NULL";
+                //}
                 return
                     SPId.ToString() + ls +
                     Tsql + ls +
-            StartTime + ls +
-            EndTime + ls +
-            Duration + ls +
-            RowsAffected + ls +
-            State + ls +
-            BytesSent + ls +
-            BytesReceived + ls +
-            SelectCount + ls +
-            SelectRows + ls +
-            ConnectionTime + ls +
-            NetworkServerTime + ls +
-            Transactions + ls;
-                // base.ToString();
+                    StartTime + ls +
+                    EndTime + ls +
+                    Duration + ls +
+                    RowsAffected + ls +
+                    State + ls +
+                    BytesSent + ls +
+                    BytesReceived + ls +
+                    SelectCount + ls +
+                    SelectRows + ls +
+                    ConnectionTime + ls +
+                    NetworkServerTime + ls +
+                    Transactions + ls +
+                    "Results are not supported in Csv! (yet...)";
+                
+
             }
         }
         private class Spids
@@ -366,6 +410,7 @@ namespace SqlServer_HeadBanger
         <td class=""tblhdr"">ConnectionTime</td>
         <td class=""tblhdr"">NetworkServerTime</td>
         <td class=""tblhdr"">Transactions</td>
+        <td class=""tblhdr"">RunResults</td>
     </tr>
 
 ";
@@ -395,7 +440,8 @@ namespace SqlServer_HeadBanger
                         REC.SelectRows + COL +
                         REC.ConnectionTime + COL +
                         REC.NetworkServerTime + COL +
-                        REC.Transactions + END_ROW + Environment.NewLine;
+                        REC.Transactions + COL +
+                        REC.RunResults + END_ROW + Environment.NewLine;
                 }
                 content += @"   </TABLE>
     <h3>Did you enjoyed the almighty HeadBanger? so go and tell **ALL** your friends about it!</h3>
@@ -442,9 +488,10 @@ namespace SqlServer_HeadBanger
                         "SelectRows" + ls +
                         "ConnectionTime" + ls +
                         "NetworkServerTime" + ls +
-                        "Transactions";
+                        "Transactions" + ls +
+                        "RunResults" ;
                 sw.WriteLine(headerLine);
-                int iColCount = 13;
+                int iColCount = 14;
                 foreach (Data dt in dg.ItemsSource)
                 {
                     sw.WriteLine(dt.ToString());
