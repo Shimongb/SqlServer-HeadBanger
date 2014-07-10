@@ -13,7 +13,10 @@
             <ColumnDefinition Width="10*"/>
             <ColumnDefinition Width="95"/>
             <ColumnDefinition Width="10*"/>
-            <ColumnDefinition Width="290"/>
+            <ColumnDefinition Width="65"/>
+            <ColumnDefinition Width="65"/>
+            <ColumnDefinition Width="65"/>
+            <ColumnDefinition Width="65"/>
             <ColumnDefinition Width="20*"/>
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="40"/>
@@ -34,7 +37,7 @@
             <RowDefinition Height="45"/>
             <RowDefinition Height="5"/>
         </Grid.RowDefinitions>
-        <Button Name="btnstrt" Content="Start Test" HorizontalAlignment="Left" Margin="3,10,0,0" VerticalAlignment="Top" Width="120" BorderThickness="0.5" Background="{x:Null}" Foreground="#FF45AFB9" BorderBrush="{x:Null}" Height="30" RenderTransformOrigin="-0.012,0.521" FontFamily="Tahoma" FontSize="16"  Click="Button_Click_1" Grid.Row="10" Grid.Column="10" Grid.ColumnSpan="3"/>
+        <Button Name="btnstrt" Content="Start Test" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Width="120" BorderThickness="0.5" Background="{x:Null}" Foreground="#FF45AFB9" BorderBrush="{x:Null}" Height="30" RenderTransformOrigin="-0.012,0.521" FontFamily="Tahoma" FontSize="16"  Click="Button_Click_1" Grid.Row="10" Grid.Column="14" Grid.ColumnSpan="2"/>
         <TextBox x:Name="srvTB" Text="" HorizontalAlignment="Left" Height="22" Margin="3,4,0,4" TextWrapping="Wrap" VerticalAlignment="Center" Width="182" Foreground="#FF406DBD" Background="White" Grid.Column="3" Grid.Row="1">
             <TextBox.BorderBrush>
                 <LinearGradientBrush EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
@@ -66,7 +69,7 @@
                 </LinearGradientBrush>
             </PasswordBox.BorderBrush>
         </PasswordBox>
-        <Button x:Name="btntstcon" Content="Set Connection" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="90" BorderThickness="0.5" Background="{x:Null}" Foreground="#FF45AFB9" BorderBrush="{x:Null}" Height="21" RenderTransformOrigin="-0.012,0.521" FontFamily="Tahoma" FontSize="11" Click="Button_Click" Grid.Row="6" Grid.Column="3"/>
+        <Button x:Name="btntstcon" Content="Set Connection" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="90" BorderThickness="0.5" Background="{x:Null}" Foreground="#FF45AFB9" BorderBrush="{x:Null}" Height="21" RenderTransformOrigin="-0.012,0.521" FontFamily="Tahoma" FontSize="11" Click="ConnectBTN_CLK" Grid.Row="6" Grid.Column="3"/>
         <TextBox x:Name="dbTB" Text="master" HorizontalAlignment="Left" Height="22" Margin="3,4,0,4" TextWrapping="Wrap" VerticalAlignment="Center" Width="182" Foreground="#FF406DBD" Background="White" Grid.Column="3" Grid.Row="4">
             <TextBox.BorderBrush>
                 <LinearGradientBrush EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
@@ -76,11 +79,11 @@
                 </LinearGradientBrush>
             </TextBox.BorderBrush>
         </TextBox>
-        <Label x:Name="RSLT_lbl" HorizontalAlignment="Stretch" Margin="3,10,1,5" VerticalAlignment="Stretch"  Grid.Row="10" Grid.ColumnSpan="4" Grid.Column="1"/>
-        <Slider x:Name="sldr" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Height="22" VerticalAlignment="Center" Margin="20,4,0,4" SmallChange="1" Maximum="15000" Grid.Column="9" Grid.ColumnSpan="1" ValueChanged="Slider_ValueChanged" TickPlacement="BottomRight" Grid.Row="2"/>
+        <Label x:Name="RSLT_lbl" HorizontalAlignment="Stretch" Margin="3,10,1,5" VerticalAlignment="Stretch"  Grid.Row="10" Grid.ColumnSpan="7" Grid.Column="1"/>
+        <Slider x:Name="sldr" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Height="22" VerticalAlignment="Center" Margin="20,4,0,4" SmallChange="1" Maximum="15000" Grid.Column="9" Grid.ColumnSpan="3" ValueChanged="Slider_ValueChanged" TickPlacement="BottomRight" Grid.Row="2"/>
 
         <Label x:Name="trlbl" Content="Threads:" HorizontalAlignment="Right" Margin="0,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Column="7" Grid.Row="2"/>
-        <RichTextBox  x:Name="TSQLTB"  HorizontalAlignment="Stretch" Margin="1,5,5,1" VerticalAlignment="Stretch"  Foreground="#FF29832D" Background="White" Grid.Column="6" Grid.Row="4" Grid.RowSpan="4" Grid.ColumnSpan="7">
+        <RichTextBox  x:Name="TSQLTB"  HorizontalAlignment="Stretch" Margin="1,5,5,1" VerticalAlignment="Stretch"  Foreground="#FF29832D" Background="White" Grid.Column="6" Grid.Row="4" Grid.RowSpan="4" Grid.ColumnSpan="9">
             <RichTextBox.BorderBrush>
                 <LinearGradientBrush EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
                     <GradientStop Color="#FFABADB3" Offset="0.05"/>
@@ -105,12 +108,6 @@
                 <Paragraph FontSize="12.6666666666667" FontFamily="Consolas" Margin="0">
                     <Span Foreground="Green">
                         <Run Text="--For a random int parameter use {RAND_INT} as value"/>
-                    </Span>
-                </Paragraph>
-                <Paragraph FontSize="12.6666666666667" FontFamily="Consolas" Margin="0">
-                    <Run Foreground="Green" Text="--For a random letter wrap the "/>
-                    <Span Foreground="Green">
-                        <Run Text="{}{RAND_INT} with the char() function"/>
                     </Span>
                 </Paragraph>
                 <Paragraph FontSize="12.6666666666667" FontFamily="Consolas" Margin="0">
@@ -143,7 +140,7 @@
                     <Run Foreground="Green" Text="Run&gt;&gt;&gt;"/>
                 </Paragraph>
                 <Paragraph FontSize="12.6666666666667" FontFamily="Consolas" Margin="0">
-                    <Run Foreground="Green" Text=""/>
+                    <Run Foreground="Green" Text="--Get results to Html/Csv (Right click the results grid)"/>
                 </Paragraph>
                 <Paragraph FontSize="12.6666666666667" FontFamily="Consolas" Margin="0">
                     <Run Foreground="Blue" Text=""/>
@@ -155,10 +152,18 @@
         </RichTextBox >
         <Label Content="TSQL:" HorizontalAlignment="Left" Margin="0,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Column="7" Grid.Row="3" RenderTransformOrigin="0.975,0.263"/>
         <Button x:Name="editBTN" Content="Edit connection" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Width="188" BorderThickness="0.5" Background="{x:Null}" Foreground="#FF45AFB9" BorderBrush="{x:Null}" Height="21" RenderTransformOrigin="-0.012,0.521" FontFamily="Tahoma" FontSize="11" Click="EditButton_Click" IsEnabled="False" Grid.Column="3" Grid.Row="6"/>
-        <DataGrid x:Name="dg" HorizontalAlignment="Stretch" Margin="5,6,5,5" VerticalAlignment="Stretch"  IsReadOnly="True" HorizontalGridLinesBrush="#FFA6DAF1" VerticalGridLinesBrush="#FFA6DAF1" BorderThickness="0.5,0.5,0,0.5" FontFamily="Tahoma" Grid.Row="9" Grid.ColumnSpan="12" Grid.Column="1"/>
+        <DataGrid x:Name="dg" HorizontalAlignment="Stretch" Margin="0,6,0,5" VerticalAlignment="Stretch"  IsReadOnly="True" HorizontalGridLinesBrush="#FFA6DAF1" VerticalGridLinesBrush="#FFA6DAF1" BorderThickness="0.5,0.5,0,0.5" FontFamily="Tahoma" Grid.Row="9" Grid.ColumnSpan="16" Grid.Column="1">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy all(with Headers)" Click="CopyAllWithHDR"/>
+                    <MenuItem Header="Results to Csv" Click="ResToCsv_run"/>
+                    <MenuItem Header="Results to Html" Click="ResultsToHtmlRP"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
         <Label x:Name="TI_lbl" Content="Timeout:" HorizontalAlignment="Right" Margin="0,4,3,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Row="5" Grid.Column="1"/>
         <Slider x:Name="TimeOutTB" HorizontalAlignment="Left"  IsSnapToTickEnabled="True" Margin="3,5,0,3" VerticalAlignment="Center" Width="182" Maximum="1200" SmallChange="1" TickPlacement="BottomRight" ValueChanged="TimeOutTB_ValueChanged" Value="30" Grid.Column="3" Grid.Row="5"/>
-        <TextBox x:Name="RND_st" Text="0" HorizontalAlignment="Left" Margin="0,4" VerticalAlignment="Center" Foreground="#FF4E77A0" Grid.Column="12" Grid.Row="1" Width="36">
+        <TextBox x:Name="RND_st" Text="0" HorizontalAlignment="Left" Margin="0,4" VerticalAlignment="Center" Foreground="#FF4E77A0" Grid.Column="15" Grid.Row="1" Width="36">
             <TextBox.BorderBrush>
                 <LinearGradientBrush EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
                     <GradientStop Color="#FFABADB3" Offset="0.05"/>
@@ -167,7 +172,7 @@
                 </LinearGradientBrush>
             </TextBox.BorderBrush>
         </TextBox>
-        <TextBox x:Name="RND_end" Text="1000" Width="36" HorizontalAlignment="Left" Margin="0,4" VerticalAlignment="Center" Foreground="#FF4E77A0" RenderTransformOrigin="-0.307,0.833" Grid.Column="12" Grid.Row="2">
+        <TextBox x:Name="RND_end" Text="1000" Width="36" HorizontalAlignment="Left" Margin="0,4" VerticalAlignment="Center" Foreground="#FF4E77A0" RenderTransformOrigin="-0.307,0.833" Grid.Column="15" Grid.Row="2">
             <TextBox.BorderBrush>
                 <LinearGradientBrush EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
                     <GradientStop Color="#FFABADB3" Offset="0.05"/>
@@ -176,11 +181,10 @@
                 </LinearGradientBrush>
             </TextBox.BorderBrush>
         </TextBox>
-        <Label Content="{}{RAND_INT} Min:" HorizontalAlignment="Right" Margin="0,4,3,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Column="11" Grid.Row="1"/>
-        <Label Content="{}{RAND_INT} Max:" HorizontalAlignment="Right" Margin="0,4,3,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Column="11" Grid.Row="2"/>
+        <Label Content="{}{RAND_INT} Min:" HorizontalAlignment="Right" Margin="0,4,3,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Column="14" Grid.Row="1"/>
+        <Label Content="{}{RAND_INT} Max:" HorizontalAlignment="Right" Margin="0,4,3,4" VerticalAlignment="Center" Foreground="#FF7797CF" FontFamily="Tahoma" FontSize="11" Grid.Column="14" Grid.Row="2"/>
 
         <Label x:Name="spidLBL" Content="" HorizontalAlignment="Stretch" Margin="6,3,6,0" VerticalAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="7" Grid.Column="1"/>
-        <Button x:Name="ResToHtml" Content="Generate Html Report" HorizontalAlignment="Center" Margin="41,10,24,0" VerticalAlignment="Top" Width="180" BorderThickness="0.5" Background="{x:Null}" Foreground="#FF45AFB9" BorderBrush="{x:Null}" Height="30" RenderTransformOrigin="-0.012,0.521" FontFamily="Tahoma" FontSize="16"  Click="Button_Click_2" Grid.Row="10" Grid.Column="9"/>
-        <GroupBox Grid.ColumnSpan="9" Grid.Column="5" Header="Properies" HorizontalAlignment="Stretch" Margin="5,0,0,0" Grid.Row="0" Grid.RowSpan="9" VerticalAlignment="Stretch" Foreground="#FF4A89B4"/>
+        <GroupBox Grid.ColumnSpan="11" Grid.Column="5" Header="Properies" HorizontalAlignment="Stretch" Margin="5,0,0,0" Grid.Row="0" Grid.RowSpan="9" VerticalAlignment="Stretch" Foreground="#FF4A89B4"/>
     </Grid>
 </Window>

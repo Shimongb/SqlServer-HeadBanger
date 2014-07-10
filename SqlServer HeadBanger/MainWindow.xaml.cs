@@ -36,7 +36,6 @@ namespace SqlServer_HeadBanger
             InitializeComponent();
             DisableStartButton();
             TimeOutTB.Value = 30;
-            ResToHtml.Visibility = Visibility.Hidden;
         }
         private void DisableStartButton()
         {
@@ -59,8 +58,8 @@ namespace SqlServer_HeadBanger
             pwdTB.IsEnabled = false;
             editBTN.IsEnabled = true;
         }
-        
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private void ConnectBTN_CLK(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -132,7 +131,7 @@ namespace SqlServer_HeadBanger
             var RandStart = RND_st.Text.Trim();
             var RandEnd = RND_end.Text.Trim();
             var ST = DateTime.Now;
-            
+
             for (int i = 0; i < sldr.Value; i++)
             {
                 tasks[i] = Task.Run(new Action(() => myMethod(server, db, userId, password, tsql, TimeOut, RandStart, RandEnd)));
@@ -151,14 +150,13 @@ namespace SqlServer_HeadBanger
                 var x = from spidt in SpidList
                         group spidt by new { spid = spidt.SPId } into gcollection
                         select new { Count = gcollection.Count() };
-                RSLT_lbl.Content = "Total threads [" + SpidList.Count.ToString() + "] | Unique SPID's [" + x.Count().ToString() + "] | Duration [" + dateDifference.ToString()+ "]";
+                RSLT_lbl.Content = "Total threads [" + SpidList.Count.ToString() + "] | Unique SPID's [" + x.Count().ToString() + "] | Duration [" + dateDifference.ToString() + "]";
             }
             catch (Exception exp)
             {
 
                 RSLT_lbl.Content = "Error: " + exp.Message.ToString();
             }
-            ResToHtml.Visibility = Visibility.Visible;
         }
 
         private void RegData(string SPId, string Tsql, string StartTime, string EndTime, long Duration, long RowsAffected, string State, long BytesSent, long BytesReceived, long SelectCount,
@@ -187,13 +185,21 @@ namespace SqlServer_HeadBanger
                     Transactions = Transactions
                 });
             }
-            if (SpidList != null)
+            try
             {
-                SpidList.Add(new Spids
+                if (SpidList != null)
                 {
-                    SPId = SPId
-                });
+                    SpidList.Add(new Spids
+                    {
+                        SPId = SPId
+                    });
+                }
             }
+            catch (Exception exp)
+            {
+                RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+            }
+            
         }
 
         private void myMethod(string server, string db, string userId, string password, string tsql, string TimeOut, string RandStart, string RandEnd)
@@ -222,7 +228,7 @@ namespace SqlServer_HeadBanger
                     var res = command.ExecuteScalar();
                     var spid = res.ToString();
                     SqlCommand cm = new SqlCommand(CodeStr, connection);
-                    
+
                     var starttime = DateTime.Now;
                     string StartTime = starttime.ToString("HH:mm:ss:fff");
                     try
@@ -230,25 +236,25 @@ namespace SqlServer_HeadBanger
                         RA = cm.ExecuteNonQuery();
                         var endtime = DateTime.Now;
                         var duration = endtime - starttime;
-                        IDictionary currentStatistics = connection.RetrieveStatistics();  
-  
-                        long bytesReceived = (long) currentStatistics["BytesReceived"];
-                        long bytesSent = (long) currentStatistics["BytesSent"];
-                        long selectCount = (long) currentStatistics["SelectCount"];
-                        long selectRows = (long) currentStatistics["SelectRows"];
-                        long ConnectionTime = (long) currentStatistics["ConnectionTime"];
+                        IDictionary currentStatistics = connection.RetrieveStatistics();
+
+                        long bytesReceived = (long)currentStatistics["BytesReceived"];
+                        long bytesSent = (long)currentStatistics["BytesSent"];
+                        long selectCount = (long)currentStatistics["SelectCount"];
+                        long selectRows = (long)currentStatistics["SelectRows"];
+                        long ConnectionTime = (long)currentStatistics["ConnectionTime"];
                         long IduRows = (long)currentStatistics["IduRows"];
                         long NetworkServerTime = (long)currentStatistics["NetworkServerTime"];
-                        long Transactions = (long)currentStatistics["Transactions"];                      
+                        long Transactions = (long)currentStatistics["Transactions"];
                         string EndTime = endtime.ToString("HH:mm:ss:fff");
                         long Duration = ((long)duration.TotalMilliseconds);
-                        RegData(spid, ClearTsql, StartTime, EndTime, Duration, IduRows, "Success", bytesSent, bytesReceived, selectCount, selectRows, ConnectionTime, NetworkServerTime, Transactions); 
+                        RegData(spid, ClearTsql, StartTime, EndTime, Duration, IduRows, "Success", bytesSent, bytesReceived, selectCount, selectRows, ConnectionTime, NetworkServerTime, Transactions);
                     }
                     catch (Exception e)
                     {
-                        
-                       string  errmsgstr = e.Message.ToString();
-                       RegData(spid, ClearTsql, StartTime, " -- ", 0, 0, errmsgstr, 0, 0, 0, 0, 0, 0, 0);                       
+
+                        string errmsgstr = e.Message.ToString();
+                        RegData(spid, ClearTsql, StartTime, " -- ", 0, 0, errmsgstr, 0, 0, 0, 0, 0, 0, 0);
                     }
 
                     connection.Close();
@@ -276,12 +282,33 @@ namespace SqlServer_HeadBanger
             public long ConnectionTime { get; set; }
             public long NetworkServerTime { get; set; }
             public long Transactions { get; set; }
+
+            public override string ToString()
+            {
+                string ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+                return
+                    SPId.ToString() + ls +
+                    Tsql + ls +
+            StartTime + ls +
+            EndTime + ls +
+            Duration + ls +
+            RowsAffected + ls +
+            State + ls +
+            BytesSent + ls +
+            BytesReceived + ls +
+            SelectCount + ls +
+            SelectRows + ls +
+            ConnectionTime + ls +
+            NetworkServerTime + ls +
+            Transactions + ls;
+                // base.ToString();
+            }
         }
         private class Spids
         {
             public string SPId { get; set; }
         }
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private void ResultsToHtmlRP(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -356,10 +383,10 @@ namespace SqlServer_HeadBanger
                         OPN_ROW = OPN_ROW.Replace("$CLASS$", "Row_tbl");
                     }
                     content += OPN_ROW + REC.SPId.ToString() + COL +
-                        REC.Tsql.ToString() + COL + 
-                        REC.StartTime.ToString() + COL + 
-                        REC.EndTime.ToString() + COL + 
-                        REC.Duration.ToString() + COL + 
+                        REC.Tsql.ToString() + COL +
+                        REC.StartTime.ToString() + COL +
+                        REC.EndTime.ToString() + COL +
+                        REC.Duration.ToString() + COL +
                         REC.RowsAffected + COL +
                         REC.State.ToString() + COL +
                         REC.BytesSent + COL +
@@ -380,11 +407,81 @@ namespace SqlServer_HeadBanger
             catch (Exception exp)
             {
 
-                RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+                if (dg.ItemsSource == null)
+                {
+                    RSLT_lbl.Content = "Error: No data exists in grid!";
+                }
+                else
+                {
+                    RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+                }
+
             }
-           
+
 
         }
+
+        private void ResToCsv_run(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string FileUniqueName = "\\HeadBangingResult_" + DateTime.Now.ToBinary().ToString().Replace("-", "") + ".csv";
+                StreamWriter sw = new StreamWriter(path + FileUniqueName, false);
+                string ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+                string headerLine = "Spid" + ls +
+                        "Tsql" + ls +
+                        "StartTime" + ls +
+                        "EndTime" + ls +
+                        "Duration" + ls +
+                        "RowsAffected" + ls +
+                        "State" + ls +
+                        "BytesSent" + ls +
+                        "BytesReceived" + ls +
+                        "SelectCount" + ls +
+                        "SelectRows" + ls +
+                        "ConnectionTime" + ls +
+                        "NetworkServerTime" + ls +
+                        "Transactions";
+                sw.WriteLine(headerLine);
+                int iColCount = 13;
+                foreach (Data dt in dg.ItemsSource)
+                {
+                    sw.WriteLine(dt.ToString());
+                }
+                sw.Close();
+                MessageBox.Show("Csv Report was generated successfully!");
+            }
+            catch (Exception exp)
+            {
+
+                RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+            }
+
+        }
+
+        private void CopyAllWithHDR(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (dg.ItemsSource != null)
+                {
+                    dg.SelectAllCells();
+                    dg.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+                    ApplicationCommands.Copy.Execute(null, dg);
+                    dg.UnselectAllCells();
+
+                }
+                MessageBox.Show("Data copied to clipboard successfully!");
+            }
+            catch (Exception exp)
+            {
+
+                RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+            }
+
+        }
+
 
 
     }
