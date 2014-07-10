@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -160,7 +161,40 @@ namespace SqlServer_HeadBanger
             ResToHtml.Visibility = Visibility.Visible;
         }
 
-
+        private void RegData(string SPId, string Tsql, string StartTime, string EndTime, long Duration, long RowsAffected, string State, long BytesSent, long BytesReceived, long SelectCount,
+                                 long SelectRows,
+                                 long ConnectionTime,
+                                 long NetworkServerTime,
+                                 long Transactions)
+        {
+            if (RsltTable != null)
+            {
+                RsltTable.Add(new Data
+                {
+                    SPId = SPId,
+                    Tsql = Tsql,
+                    StartTime = StartTime,
+                    EndTime = EndTime,
+                    Duration = Duration,
+                    RowsAffected = RowsAffected,
+                    State = State,
+                    BytesSent = BytesSent,
+                    BytesReceived = BytesReceived,
+                    SelectCount = SelectCount,
+                    SelectRows = SelectRows,
+                    ConnectionTime = ConnectionTime,
+                    NetworkServerTime = NetworkServerTime,
+                    Transactions = Transactions
+                });
+            }
+            if (SpidList != null)
+            {
+                SpidList.Add(new Spids
+                {
+                    SPId = SPId
+                });
+            }
+        }
 
         private void myMethod(string server, string db, string userId, string password, string tsql, string TimeOut, string RandStart, string RandEnd)
         {
@@ -178,23 +212,26 @@ namespace SqlServer_HeadBanger
                     Int32.TryParse(RandEnd, out RND_B);
                     int RandInt = rnd.Next(RND_A, RND_B);
                     CodeStr = tsql.Replace("{RAND_INT}", RandInt.ToString());
+                    string pattern = "(\\/\\*([\0-\uffff]*?)\\*\\/)|(--.*)";
+                    Regex rgx = new Regex(pattern);
+                    string ClearTsql = rgx.Replace(CodeStr, "").Trim().ToString();
+                    int RA = 0;
 
                     connection.StatisticsEnabled = true;
                     connection.Open();
-                    command.ExecuteNonQuery();
                     var res = command.ExecuteScalar();
                     var spid = res.ToString();
                     SqlCommand cm = new SqlCommand(CodeStr, connection);
-                    int RA = 0;
+                    
                     var starttime = DateTime.Now;
+                    string StartTime = starttime.ToString("HH:mm:ss:fff");
                     try
                     {
                         RA = cm.ExecuteNonQuery();
                         var endtime = DateTime.Now;
                         var duration = endtime - starttime;
-                        string Xinf = "";
-                        IDictionary currentStatistics = connection.RetrieveStatistics();
-                            
+                        IDictionary currentStatistics = connection.RetrieveStatistics();  
+  
                         long bytesReceived = (long) currentStatistics["BytesReceived"];
                         long bytesSent = (long) currentStatistics["BytesSent"];
                         long selectCount = (long) currentStatistics["SelectCount"];
@@ -202,72 +239,16 @@ namespace SqlServer_HeadBanger
                         long ConnectionTime = (long) currentStatistics["ConnectionTime"];
                         long IduRows = (long)currentStatistics["IduRows"];
                         long NetworkServerTime = (long)currentStatistics["NetworkServerTime"];
-                        long Transactions = (long)currentStatistics["Transactions"];
-
-                        Xinf = 
-                        "BytesReceived: " + bytesReceived.ToString()+ Environment.NewLine +
-                        "BytesSent: " + bytesSent.ToString() + Environment.NewLine +
-                        "SelectCount: " + selectCount.ToString() + Environment.NewLine +
-                        "SelectRows: " + selectRows.ToString() + Environment.NewLine + 
-                        "ConnectionTime: " + ConnectionTime.ToString() + Environment.NewLine + 
-                        "IduRows: " + IduRows.ToString() + Environment.NewLine +
-                        "NetworkServerTime: " + NetworkServerTime.ToString() + Environment.NewLine +
-                        "Transactions: " + Transactions.ToString();
-
-
-
-
-                        RsltTable.Add(new Data
-                        {
-                            SPId = spid,
-                            Tsql = CodeStr,
-                            StartTime = starttime.ToString("HH:mm:ss:fff"),
-                            EndTime = endtime.ToString("HH:mm:ss:fff"),
-                            Duration = ((long)duration.TotalMilliseconds).ToString(),
-                            RowsAffected = IduRows,
-                            State = "Success",
-                            BytesReceived = bytesReceived,
-                            BytesSent = bytesSent,
-                            SelectCount = selectCount,
-                            SelectRows = selectRows,
-                            ConnectionTime = ConnectionTime,
-                            NetworkServerTime =NetworkServerTime,
-                            Transactions =Transactions
-                        });
-                        SpidList.Add(new Spids
-                        {
-                            SPId = spid
-                        });
-
-
-
-
+                        long Transactions = (long)currentStatistics["Transactions"];                      
+                        string EndTime = endtime.ToString("HH:mm:ss:fff");
+                        long Duration = ((long)duration.TotalMilliseconds);
+                        RegData(spid, ClearTsql, StartTime, EndTime, Duration, IduRows, "Success", bytesSent, bytesReceived, selectCount, selectRows, ConnectionTime, NetworkServerTime, Transactions); 
                     }
                     catch (Exception e)
                     {
-                        if (RsltTable != null)
-                        {
-                            RsltTable.Add(new Data
-                            {
-                                SPId = spid,
-                                Tsql = CodeStr,
-                                StartTime = " -- ",
-                                EndTime = " -- ",
-                                Duration = "0",
-                                RowsAffected = 0,
-                                State = e.Message.ToString(),
-                                BytesReceived = 0,
-                                BytesSent = 0,
-                                SelectCount = 0,
-                                SelectRows = 0,
-                                ConnectionTime = 0,
-                                NetworkServerTime = 0,
-                                Transactions = 0
-                            });
-                        }
-
                         
-                        
+                       string  errmsgstr = e.Message.ToString();
+                       RegData(spid, ClearTsql, StartTime, " -- ", 0, 0, errmsgstr, 0, 0, 0, 0, 0, 0, 0);                       
                     }
 
                     connection.Close();
@@ -285,11 +266,11 @@ namespace SqlServer_HeadBanger
             public string Tsql { get; set; }
             public string StartTime { get; set; }
             public string EndTime { get; set; }
-            public string Duration { get; set; }
+            public long Duration { get; set; }
             public long RowsAffected { get; set; }
             public string State { get; set; }
-            public long BytesReceived { get; set; }
             public long BytesSent { get; set; }
+            public long BytesReceived { get; set; }
             public long SelectCount { get; set; }
             public long SelectRows { get; set; }
             public long ConnectionTime { get; set; }
@@ -351,13 +332,13 @@ namespace SqlServer_HeadBanger
         <td class=""tblhdr"">Duration</td>
         <td class=""tblhdr"">RowsAffected</td>
         <td class=""tblhdr"">State</td>
-<td class=""tblhdr"">BytesReceived</td>
-<td class=""tblhdr"">BytesSent</td>
-<td class=""tblhdr"">SelectCount</td>
-<td class=""tblhdr"">SelectRows</td>
-<td class=""tblhdr"">ConnectionTime</td>
-<td class=""tblhdr"">NetworkServerTime</td>
-<td class=""tblhdr"">Transactions</td>
+        <td class=""tblhdr"">BytesSent</td>
+        <td class=""tblhdr"">BytesReceived</td>
+        <td class=""tblhdr"">SelectCount</td>
+        <td class=""tblhdr"">SelectRows</td>
+        <td class=""tblhdr"">ConnectionTime</td>
+        <td class=""tblhdr"">NetworkServerTime</td>
+        <td class=""tblhdr"">Transactions</td>
     </tr>
 
 ";
@@ -380,9 +361,9 @@ namespace SqlServer_HeadBanger
                         REC.EndTime.ToString() + COL + 
                         REC.Duration.ToString() + COL + 
                         REC.RowsAffected + COL +
-                        REC.State.ToString() + COL + 
-                        REC.BytesReceived + COL +
+                        REC.State.ToString() + COL +
                         REC.BytesSent + COL +
+                        REC.BytesReceived + COL +
                         REC.SelectCount + COL +
                         REC.SelectRows + COL +
                         REC.ConnectionTime + COL +
