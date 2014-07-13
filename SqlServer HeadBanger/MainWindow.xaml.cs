@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Web.Script.Serialization;
 
 namespace SqlServer_HeadBanger
 {
@@ -36,6 +37,7 @@ namespace SqlServer_HeadBanger
             InitializeComponent();
             DisableStartButton();
             TimeOutTB.Value = 30;
+            RadioButtonVisible(2);
         }
         private void DisableStartButton()
         {
@@ -73,7 +75,7 @@ namespace SqlServer_HeadBanger
                 }
                 foreach (DataRow DRow in results.Rows)
                 {
-                    foreach (var item in DRow.ItemArray) // Loop over the items.
+                    foreach (var item in DRow.ItemArray)
                     {
                         spidLBL.Content = "@@SPID: " + item.ToString();
                     }
@@ -100,10 +102,6 @@ namespace SqlServer_HeadBanger
             DisableStartButton();
         }
 
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            trlbl.Content = "Threads: (" + sldr.Value.ToString() + ")";
-        }
         private void TimeOutTB_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             TI_lbl.Content = "Timeout: (" + TimeOutTB.Value.ToString() + ")";
@@ -116,47 +114,133 @@ namespace SqlServer_HeadBanger
             );
             return textRange.Text;
         }
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        public string ConvertDataTabletoJson(DataTable dt)
         {
+                    System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                    List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+                    Dictionary<string, object> row;
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        row = new Dictionary<string, object>();
+                        foreach (DataColumn col in dt.Columns)
+                        {
+                            row.Add(col.ColumnName, dr[col]);
+                        }
+                        rows.Add(row);
+                    }
+                    return serializer.Serialize(rows);
+        }
 
-            RsltTable = new List<Data>();
-            SpidList = new List<Spids>();
-            var server = srvTB.Text.Trim();
-            var db = dbTB.Text.Trim();
-            var userId = unTB.Text.Trim();
-            var password = pwdTB.Password.Trim();
-            var tsql = StringFromRTB(TSQLTB);
-            var TimeOut = TimeOutTB.Value.ToString();
-            var tasks = new Task[(int)sldr.Value];
-            var RandStart = RND_st.Text.Trim();
-            var RandEnd = RND_end.Text.Trim();
-            var ST = DateTime.Now;
 
-            for (int i = 0; i < sldr.Value; i++)
+        public string ConvertDataTableToString(DataTable dt)
+        {
+            int cc = dt.Columns.Count;
+            string res ="", ls = "";
+            int ci = 0;
+            string sep = new String('-', cc * 10);
+            foreach (DataColumn dc in dt.Columns)
             {
-                tasks[i] = Task.Run(new Action(() => myMethod(server, db, userId, password, tsql, TimeOut, RandStart, RandEnd)));
+                ls = "  |";
+                if (ci == cc - 1)
+                    {
+                        ls = Environment.NewLine + sep + Environment.NewLine;
+                    }
+                res += dc.ColumnName.ToString() + ls;
+                ci++;
             }
-            Task.WaitAll(tasks);
-            var ET = DateTime.Now;
-            TimeSpan dateDifference = ET.Subtract(ST);
+            foreach (DataRow dr in dt.Rows)
+            {
+                ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
 
-            dg.ItemsSource = null;
-            dg.ItemsSource = RsltTable;
+                for (int i = 0; i < cc; i++)
+                {
+                    if (i == cc - 1)
+                    {
+                        ls = Environment.NewLine;
+                    }
+                    if (dr[i].ToString() != null || dr[i].ToString().Length > 0)
+                    {
+                        res += dr[i].ToString() + ls;
+                    }
+                    else
+                    {
+                        res += "[NULL]" + ls;
+                    }
 
-            var g = SpidList.GroupBy(i => i);
-            g.Count().ToString();
+                }
+                res  += Environment.NewLine; 
+            }
+            return res;
+        }
+        private void StartTheMagic(object sender, RoutedEventArgs e)
+        {
+            int TasksAmount = 0;
             try
             {
-                var x = from spidt in SpidList
-                        group spidt by new { spid = spidt.SPId } into gcollection
-                        select new { Count = gcollection.Count() };
-                RSLT_lbl.Content = "Total threads [" + SpidList.Count.ToString() + "] | Unique SPID's [" + x.Count().ToString() + "] | Duration [" + dateDifference.ToString() + "]";
+                TasksAmount = int.Parse(ThreadsIntTB.Text);
             }
-            catch (Exception exp)
+            catch (Exception)
             {
 
-                RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+                MessageBox.Show(ThreadsIntTB.Text + " is not a valid threads number!");
             }
+            
+            int.TryParse(ThreadsIntTB.Text, out TasksAmount);
+
+            if (TasksAmount >= 0)
+            {
+                int ResFormat = 0;
+                if (ResInclude.IsChecked == true)
+                {
+                    if (RB2_ToString.IsChecked == true)
+                    {
+                        ResFormat = 1; 
+                    }
+                    else if (RB_ToJson.IsChecked == true)
+	                {
+                        ResFormat = 2;
+	                }
+                } 
+                RsltTable = new List<Data>();
+                SpidList = new List<Spids>();
+                var server = srvTB.Text.Trim();
+                var db = dbTB.Text.Trim();
+                var userId = unTB.Text.Trim();
+                var password = pwdTB.Password.Trim();
+                var tsql = StringFromRTB(TSQLTB);
+                var TimeOut = TimeOutTB.Value.ToString();
+                var tasks = new Task[(int)TasksAmount];
+                var RandStart = RND_st.Text.Trim();
+                var RandEnd = RND_end.Text.Trim();
+                var ST = DateTime.Now;
+
+                for (int i = 0; i < TasksAmount; i++)
+                {
+                    tasks[i] = Task.Run(new Action(() => myMethod(server, db, userId, password, tsql, TimeOut, RandStart, RandEnd,ResFormat)));
+                }
+                Task.WaitAll(tasks);
+                var ET = DateTime.Now;
+                TimeSpan dateDifference = ET.Subtract(ST);
+
+                dg.ItemsSource = null;
+                dg.ItemsSource = RsltTable;
+
+                var g = SpidList.GroupBy(i => i);
+                g.Count().ToString();
+                try
+                {
+                    var x = from spidt in SpidList
+                            group spidt by new { spid = spidt.SPId } into gcollection
+                            select new { Count = gcollection.Count() };
+                    RSLT_lbl.Content = "Total threads [" + SpidList.Count.ToString() + "] | Unique SPID's [" + x.Count().ToString() + "] | Duration [" + dateDifference.ToString() + "]";
+                }
+                catch (Exception exp)
+                {
+
+                    RSLT_lbl.Content = "Error: " + exp.Message.ToString();
+                } 
+            }
+           
         }
 
         private void RegData(string SPId, string Tsql, string StartTime, string EndTime, long Duration, long RowsAffected, string State, long BytesSent, long BytesReceived, long SelectCount,
@@ -204,7 +288,7 @@ namespace SqlServer_HeadBanger
             
         }
 
-        private void myMethod(string server, string db, string userId, string password, string tsql, string TimeOut, string RandStart, string RandEnd)
+        private void myMethod(string server, string db, string userId, string password, string tsql, string TimeOut, string RandStart, string RandEnd,int ResultFormat)
         {
 
             DataTable results = new DataTable();
@@ -233,43 +317,31 @@ namespace SqlServer_HeadBanger
                     string StartTime = starttime.ToString("HH:mm:ss:fff");
                     try
                     {
-                        string ls = "";
                         DataSet ds = new DataSet();
                         DataTable table = new DataTable();
                         SqlDataAdapter a = new SqlDataAdapter(CodeStr, connection);
                         a.Fill(ds);
-                        int tb_serial = 1;
-                        foreach (DataTable tbl in ds.Tables)
-	                        {
-                                int cc = tbl.Columns.Count;
-                                runres += "============ Result[" + tb_serial.ToString() + "] ============" + Environment.NewLine;
+                        if (ResultFormat == 1 || ResultFormat == 2)
+                        {
+                            int tb_serial = 1;
+                            foreach (DataTable tbl in ds.Tables)
+                            {
 
-                                foreach (DataRow dr in tbl.Rows)
-	                            {
-                                    ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+                                runres += "============ Result #[" + tb_serial.ToString() + "] ============" + Environment.NewLine;
+                                if (ResultFormat == 1) //string
+                                {
+                                    runres += ConvertDataTableToString(tbl);
+                                }
+                                else if (ResultFormat == 2) //json
+                                {
+                                    runres += ConvertDataTabletoJson(tbl);
+                                }
 
-                                        for (int i = 0; i < cc; i++)
-			                            {
-                                            if (i == cc-1)
-                                            {
-                                                ls = "";
-                                            }
-                                            if (dr[i].ToString() != null || dr[i].ToString().Length > 0)
-                                            {
-                                                runres += dr[i].ToString() + ls;
-                                            }
-                                            else
-                                            {
-                                                runres += "NULL" + ls;
-                                            }
-			                             
-			                            }
-                                    runres += Environment.NewLine;
-		 
-	                            }
                                 runres += Environment.NewLine;
-		                        tb_serial++;
-	                        }
+                                tb_serial++;
+                            }  
+                        }
+                        
                         var endtime = DateTime.Now;
                         var duration = endtime - starttime;
                         IDictionary currentStatistics = connection.RetrieveStatistics();
@@ -324,10 +396,6 @@ namespace SqlServer_HeadBanger
             {
                 string ls = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
 
-                //if (rowtobyte == null)
-                //{
-                //    rowtobyte = "NULL";
-                //}
                 return
                     SPId.ToString() + ls +
                     Tsql + ls +
@@ -343,7 +411,7 @@ namespace SqlServer_HeadBanger
                     ConnectionTime + ls +
                     NetworkServerTime + ls +
                     Transactions + ls +
-                    "Results are not supported in Csv! (yet...)";
+                    "Thread results are not supported in Csv!";
                 
 
             }
@@ -441,7 +509,7 @@ namespace SqlServer_HeadBanger
                         REC.ConnectionTime + COL +
                         REC.NetworkServerTime + COL +
                         REC.Transactions + COL +
-                        REC.RunResults + END_ROW + Environment.NewLine;
+                        REC.RunResults.Replace(Environment.NewLine,"<br/>") + END_ROW + Environment.NewLine;
                 }
                 content += @"   </TABLE>
     <h3>Did you enjoyed the almighty HeadBanger? so go and tell **ALL** your friends about it!</h3>
@@ -529,7 +597,30 @@ namespace SqlServer_HeadBanger
 
         }
 
+        private void GetRes_Checked(object sender, RoutedEventArgs e)
+        {
+            RadioButtonVisible(1);
+        }
 
+        private void RadioButtonVisible(int act)
+        {
+            if (act == 1 ) //visible
+            {
+                RB_ToJson.Visibility = Visibility.Visible;
+                RB2_ToString.Visibility = Visibility.Visible; 
+            }
+            else
+            {
+                RB_ToJson.Visibility = Visibility.Hidden;
+                RB2_ToString.Visibility = Visibility.Hidden;
+            }
+            
+        }
+
+        private void GetRes_Unchecked(object sender, RoutedEventArgs e)
+        {
+            RadioButtonVisible(2);
+        }
 
     }
 }
