@@ -12,6 +12,8 @@ What does it do?
   * A special kind of Stress test/torture
   * Run Tsql with a Random parameter for each thread
   * Prevent you from Banging your Head against the SqlServer
+  * Export results to Csv
+  * Get actuall resultsets from each thread to Text/Json format
   * Generates a beautiful HTML report from the results (on your desktop!)
 
 the main use for this tool is to watch the way .net framework "recycles" connections while running multithreaded tasks.
